@@ -60,6 +60,9 @@ io.on('connection', (socket) => {
             socket.emit("ratelimit",roomlimiter.limit); return;
         }
         if(!data){return;}
+        //check ob raum schon da ist;
+        let ri = rooms.findIndex(e=>e.name==data.name);
+        if(ri!== -1){return;}
         new room(data.name,data.password,socket.id);
         joinroom(socket,data.name,data.password);
         process.stdout.write("room created:" +data.name + " with pass :" + data.password+ " made by "+ socket.nickname+ "\n");
@@ -67,6 +70,10 @@ io.on('connection', (socket) => {
 
     socket.on("joinroom",data=>{
         joinroom(socket,data.name,data.password);
+    })
+
+    socket.on("sendmsg",data=>{
+        io.to(socket.curroom).emit("sendmsg",{pre:socket.nickname,msg:data});
     })
 
     socket.on("disconnecting",()=>{

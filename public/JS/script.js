@@ -60,11 +60,30 @@ function joinroom(){
     let roomname = document.getElementById("j_roomname").value;
     let roompas = document.getElementById("j_roompas").value;
 socket.emit("joinroom",{name:roomname,password:roompas})
+}
 
+function makemsg(msgdata){
+    let chat = document.getElementById("chat")
+    let msg = document.createElement("input");
+        msg.type="text";
+        msg.disabled = true;
+        msg.value=msgdata;
+        chat.appendChild(msg);
+}
+
+function sendmsg(){
+    let msg =document.getElementById("msgtext").value;
+    msg = msg??" ";
+    if(msg==" "){return;}
+    socket.emit("sendmsg",msg);
 }
 
 socket.on("ratelimit",data=>{
     alert("You got ratelimited. Wait "+ data/1000 + " seconds until you can perform that action again.")
+})
+
+socket.on("sendmsg",data=>{
+    makemsg(data.pre+" : " +data.msg);
 })
 
 socket.on("joinedroom",room=>{
@@ -110,7 +129,6 @@ socket.on("rooms",rooms=>{
         count.value= "Users: "+e.count;
         room.appendChild(count);
 
-        console.log(e);
         if(e.haspassword){
             let pass = document.createElement("input");
             pass.type = "password";
