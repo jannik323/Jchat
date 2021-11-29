@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jchat</title>
+    <title>J-Chat</title>
     <script defer src="/socket.io/socket.io.js"></script>
     <script defer src="JS/script.js"></script>
     <link rel="stylesheet" href="CSS/style.css">
@@ -15,9 +15,9 @@
     <canvas id="bgcanvas"></canvas>
 
 
-    <div class="all">
+    <div class="all flexcol">
 
-        <p class="title">Jchat</p>
+        <p onclick="location.reload(true);" class="title">J-Chat</p>
     
     
         <div class="group flexrow" id="roommakediv">
@@ -39,9 +39,36 @@
                     <input type="button" autocomplete="off" id="joinroom" value="Send" onclick="joinroom()">
             </div>
         </div>
-    
-        <div class="group flexrow" id="chatroom">
+
+        <div class="group flexcol" id="chatroomsdiv">
             
+            
+        </div>
+    
+        <div class="flexcol group" id="chatroom">
+
+            <div class="group big center flexrow">
+                <h1 id="chat_roomname" ></h1>
+            </div>
+
+            <div class="flexrow">
+                <div class="group flexcol" id="chat">
+                    test
+                    test
+                    tes
+                </div>
+                <div class="flexcol group" id="memberlist">
+
+                </div>
+            </div>
+
+            <div class="group flexrow center" id="msgsend">
+                <input type="text" autocomplete="off"  id="msgtext" placeholder=" Message ">
+                <input type="button"  id="sendmsg" value="Send">
+                    
+            </div>
+
+
         </div>
 
     </div>

@@ -11,7 +11,7 @@ const ratelimit_msgs = 1000;
 
 class ratelimiter {
     constructor(limit= 500,start=Date.now()){
-        this.start = start
+        this.start = start;
         this.limit = limit;
     }
 
@@ -22,6 +22,22 @@ class ratelimiter {
     }
 }
 
+const rooms = [
+
+];
+
+class room{
+    constructor(name="none",password=false,creator=null){
+        this.name = name;
+        this.password = password;
+        this.creator = creator;
+        rooms.push(this);
+    }
+}
+
+new room("default");
+
+
 
 app.use(express.static(__dirname + '/public'));
 app.get('/', (req, res) => {
@@ -30,17 +46,90 @@ app.get('/', (req, res) => {
 
 
 io.on('connection', (socket) => {
-    process.stdout.write(socket.id+" has joined \n");
-    socket.join("default");
+    socket.curroom = null;
+    socket.nickname = "Dude"+(Math.round(Math.random()*1000));
+    process.stdout.write(socket.nickname+" has joined \n");
+    joinroom(socket);
+    socket.emit("rooms",getroomnames());
 
+
+
+    let roomlimiter = new ratelimiter(5000);
+    socket.on("makeroom",(data)=>{
+        if(!roomlimiter.islimit()){
+            socket.emit("ratelimit",roomlimiter.limit); return;
+        }
+        if(!data){return;}
+        new room(data.name,data.password,socket.id);
+        joinroom(socket,data.name,data.password);
+        process.stdout.write("room created:" +data.name + " with pass :" + data.password+ " made by "+ socket.nickname+ "\n");
+    });
+
+    socket.on("joinroom",data=>{
+        joinroom(socket,data.name,data.password);
+    })
+
+    socket.on("disconnecting",()=>{
+        socket.leave(socket.curroom);
+        if(socket.curroom!=="default"){
+            io.in(socket.curroom).emit("userlist",getnicknames(socket.curroom));
+        }
+        io.emit("rooms",getroomnames());
+
+    })
 
     socket.on("disconnect",()=>{
-        process.stdout.write(socket.id+" has left \n");
+        process.stdout.write(socket.nickname+" has left \n");
     })
 })
 
+function joinroom(socket,room="default",password=false){
+
+    let index =rooms.findIndex(e=>e.name==room);
+    if(index===-1){return "no room";}
+    if(rooms[index].password != null && rooms[index].password !== password){return "wrong password";}
+    
+    if(socket.curroom!==null){socket.leave(socket.curroom)}
+    socket.join(room);
+    socket.curroom = room;
+    socket.emit("joinedroom",room);
+    
+    io.to("default").emit("rooms",getroomnames());
+    if(room!=="default"){
+        io.in(room).emit("userlist",getnicknames(room));
+    }
+
+
+}
+
+
+function getnicknames(room) {
+    let nicknames = [];
+    let clients = io.sockets.adapter.rooms.get(room); 
+    if(!clients){return nicknames;}
+    for (const clientId of clients) {
+        nicknames.push(io.sockets.sockets.get(clientId).nickname);
+    }
+    return nicknames;
+}
+
+function getroomnames(){
+    names = [];
+    rooms.forEach(e=>{
+        let size;
+        if(io.sockets.adapter.rooms.get(e.name) == undefined){
+            size =0
+        }else{
+            size = io.sockets.adapter.rooms.get(e.name).size;
+        }
+        let room = {name:e.name,haspassword:false,count:size};
+        if(e.password!=null){room.haspassword=true};
+        names.push(room);
+    })
+    return names;
+}
 
 
 server.listen(PORT, () => {
-    process.stdout.write(`listening on *:${PORT}`);
+    process.stdout.write(`listening on *:${PORT} \n`);
   });
