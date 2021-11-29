@@ -1,0 +1,95 @@
+html,body{
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+.all{
+    width: 90%;
+    height: 90%;
+    margin: auto;
+
+}
+
+.title{
+    margin: 1rem auto;
+    width: fit-content;
+    font-size: 3rem;
+    color: #eee;
+    text-align: center;
+    padding: 1rem;
+    background-color:#0F2C67;
+    border-radius: 25% 50% 35% 45%;
+    text-shadow: #333 3px 3px;
+
+}
+
+.group{
+    border: 2px dotted #333;
+    padding: 1rem;
+    background-color: #0F2C67;
+    border-radius: 8px;
+    transition: all 1s;
+    height: 30px;
+    overflow-y: hidden;
+    margin-bottom: 1rem;
+}
+
+.flexcol{
+    display:flex;
+    flex-direction:column;
+}
+
+.flexrow{
+    display:flex;
+    flex-direction: row;
+}
+
+.slideshow{
+    overflow-x: hidden;
+    width: 100%;
+    transition: all 1s;
+}
+
+.slideshow[slide="on"]{
+    width: 0px;
+
+}
+
+.slideshow > *{
+    width: 100%;
+    display: flex;
+}
+
+.slideshow[slide="on"] > *{
+    display: "none";
+}
+
+.slidebtn{
+    transition: all 1s;
+    width: 100%;
+}
+
+.slidebtn[slide="off"]{
+    width: 20%;
+}
+
+#chatroom{
+    display: none;
+    transition: all 5s;
+
+}
+
+#bgcanvas{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: red;
+    z-index: -1;
+    filter: blur(10px) contrast(100);
+    outline: 1rem solid red;
+}
