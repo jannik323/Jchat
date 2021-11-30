@@ -75,12 +75,18 @@ io.on('connection', (socket) => {
         io.to(socket.curroom).emit("sendmsg",{pre:socket.nickname,msg:data});
     })
 
+    socket.on("sendnick",data=>{
+        io.in(socket.curroom).emit("sysmsg",socket.nickname+" has changed their name to "+ data);
+        socket.nickname = data;
+        io.in(socket.curroom).emit("userlist",getnicknames(socket.curroom));
+    })
+
     socket.on("disconnecting",()=>{
         socket.leave(socket.curroom);
         if(socket.curroom!=="default"){
             io.in(socket.curroom).emit("userlist",getnicknames(socket.curroom));
         }
-        io.emit("rooms",getroomnames());
+        io.to("default").emit("rooms",getroomnames());
     })
 })
 

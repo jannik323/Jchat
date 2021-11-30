@@ -157,6 +157,7 @@ input[type="text"],input[type="password"]{
 height: 300px;
 width: 100%;
 margin: .5rem;
+overflow-y: auto;
 }
 
 #memberlist{
@@ -170,13 +171,13 @@ margin: .5rem;
     cursor: default;
 }
 
-#msgsend{
+#nickchange,#msgsend{
     height: 200px;
     overflow: visible;
     padding: 1rem;
 }
 
-#msgsend > *{
+#msgsend>*,#nickchange > *{
 width: 100%;
 height: min-content;
 }

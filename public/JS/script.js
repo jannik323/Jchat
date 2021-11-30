@@ -62,21 +62,46 @@ function joinroom(){
 socket.emit("joinroom",{name:roomname,password:roompas})
 }
 
-function makemsg(msgdata){
+function makemsg(msgdata,system=false){
     let chat = document.getElementById("chat")
     let msg = document.createElement("input");
         msg.type="text";
         msg.disabled = true;
         msg.value=msgdata;
+        if(system){
+            msg.style.color = "red"
+        }
         chat.appendChild(msg);
+        chat.scrollTop=chat.scrollHeight;
 }
 
+document.getElementById("msgtext").addEventListener("keydown",e=>{
+    if(e.code==="Enter"){
+        sendmsg();
+    }
+})
+
 function sendmsg(){
-    let msg =document.getElementById("msgtext").value;
-    msg = msg??" ";
-    if(msg==" "){return;}
-    socket.emit("sendmsg",msg);
+    let msg =document.getElementById("msgtext");
+    msg.value = msg.value||" ";
+    if(msg.value==" "){return;}
+    socket.emit("sendmsg",msg.value);
+    msg.value = "";
 }
+
+function sendnick(){
+    let nick = document.getElementById("nicktext");
+    nick.value = nick.value||" ";
+    if(nick.value==" "){return;}
+    socket.emit("sendnick",nick.value);
+    nick.value = "";
+}
+
+document.getElementById("nicktext").addEventListener("keydown",e=>{
+    if(e.code==="Enter"){
+        sendnick();
+    }
+})
 
 socket.on("ratelimit",data=>{
     alert("You got ratelimited. Wait "+ data/1000 + " seconds until you can perform that action again.")
@@ -84,6 +109,10 @@ socket.on("ratelimit",data=>{
 
 socket.on("sendmsg",data=>{
     makemsg(data.pre+" : " +data.msg);
+})
+
+socket.on("sysmsg",data=>{
+    makemsg(data,true);
 })
 
 socket.on("joinedroom",room=>{
