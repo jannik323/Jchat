@@ -84,6 +84,7 @@ io.on('connection', (socket) => {
     socket.on("disconnecting",()=>{
         socket.leave(socket.curroom);
         if(socket.curroom!=="default"){
+            io.in(socket.curroom).emit("sysmsg",socket.nickname+" has left");
             io.in(socket.curroom).emit("userlist",getnicknames(socket.curroom));
         }
         io.to("default").emit("rooms",getroomnames());
@@ -103,6 +104,7 @@ function joinroom(socket,room="default",password=false){
     
     io.to("default").emit("rooms",getroomnames());
     if(room!=="default"){
+        io.in(room).emit("sysmsg",socket.nickname+" has joined");
         io.in(room).emit("userlist",getnicknames(room));
     }
 
