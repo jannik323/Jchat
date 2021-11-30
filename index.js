@@ -85,6 +85,7 @@ io.on('connection', (socket) => {
     socket.on("sendnick",data=>{
         if(!nicklimiter.islimit()){socket.emit("ratelimit",nicklimiter.limit); return;}
         io.in(socket.curroom).emit("sysmsg",socket.nickname+" has changed their name to "+ data);
+        rooms[socket.curroom].msgs.push("sysmsg",socket.nickname+" has changed their name to "+ data);
         socket.nickname = data;
         io.in(socket.curroom).emit("userlist",getnicknames(socket.curroom));
     })
@@ -93,6 +94,7 @@ io.on('connection', (socket) => {
         socket.leave(socket.curroom);
         if(socket.curroom!=="default"){
             io.in(socket.curroom).emit("sysmsg",socket.nickname+" has left");
+            rooms[socket.curroom].msgs.push("sysmsg",socket.nickname+" has left");
             io.in(socket.curroom).emit("userlist",getnicknames(socket.curroom));
         }
         io.to("default").emit("rooms",getroomnames());
@@ -112,9 +114,10 @@ function joinroom(socket,room="default",password=false){
     
     io.to("default").emit("rooms",getroomnames());
     if(room!=="default"){
-        io.in(room).emit("sysmsg",socket.nickname+" has joined");
         io.in(room).emit("userlist",getnicknames(room));
         socket.emit("lastmsgs",rooms[index].msgs);
+        io.in(room).emit("sysmsg",socket.nickname+" has joined");
+        rooms[index].msgs.push("sysmsg",socket.nickname+" has joined");
     }
 
 
