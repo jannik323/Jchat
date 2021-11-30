@@ -48,7 +48,6 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     socket.curroom = null;
     socket.nickname = "Dude"+(Math.round(Math.random()*1000));
-    process.stdout.write(socket.nickname+" has joined \n");
     joinroom(socket);
     socket.emit("rooms",getroomnames());
 
@@ -82,11 +81,6 @@ io.on('connection', (socket) => {
             io.in(socket.curroom).emit("userlist",getnicknames(socket.curroom));
         }
         io.emit("rooms",getroomnames());
-
-    })
-
-    socket.on("disconnect",()=>{
-        process.stdout.write(socket.nickname+" has left \n");
     })
 })
 
