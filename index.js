@@ -55,9 +55,7 @@ io.on('connection', (socket) => {
 
     let roomlimiter = new ratelimiter(5000);
     socket.on("makeroom",(data)=>{
-        if(!roomlimiter.islimit()){
-            socket.emit("ratelimit",roomlimiter.limit); return;
-        }
+        if(!roomlimiter.islimit()){socket.emit("ratelimit",roomlimiter.limit); return;}
         if(!data){return;}
         //check ob raum schon da ist;
         let ri = rooms.findIndex(e=>e.name==data.name);
@@ -71,11 +69,15 @@ io.on('connection', (socket) => {
         joinroom(socket,data.name,data.password);
     })
 
+    let msglimiter = new ratelimiter(200);
     socket.on("sendmsg",data=>{
+        if(!msglimiter.islimit()){socket.emit("ratelimit",roomlimiter.limit); return;}
         io.to(socket.curroom).emit("sendmsg",{pre:socket.nickname,msg:data});
     })
 
+    let nicklimiter = new ratelimiter(1000);
     socket.on("sendnick",data=>{
+        if(!nicklimiter.islimit()){socket.emit("ratelimit",roomlimiter.limit); return;}
         io.in(socket.curroom).emit("sysmsg",socket.nickname+" has changed their name to "+ data);
         socket.nickname = data;
         io.in(socket.curroom).emit("userlist",getnicknames(socket.curroom));

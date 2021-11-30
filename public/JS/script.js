@@ -71,8 +71,24 @@ function makemsg(msgdata,system=false){
         if(system){
             msg.style.color = "red"
         }
+        
         chat.appendChild(msg);
         chat.scrollTop=chat.scrollHeight;
+}
+
+function makelinkmsg(pre,msgdata){
+    let chat = document.getElementById("chat")
+    let msg = document.createElement("input");
+        msg.type="text";
+        msg.disabled = true;
+        msg.value=pre;
+        
+        let link = document.createElement("a");
+            link.innerHTML =msgdata;
+            link.href = new URL(msgdata);
+        msg.innerHTML = pre+" : "
+        chat.appendChild(msg);
+        chat.appendChild(link);
 }
 
 document.getElementById("msgtext").addEventListener("keydown",e=>{
@@ -108,6 +124,11 @@ socket.on("ratelimit",data=>{
 })
 
 socket.on("sendmsg",data=>{
+    let pattern = new RegExp(/(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/igm);
+        if(pattern.test(data.msg)){
+            makelinkmsg(data.pre+" : ",data.msg)
+            return;
+        }
     makemsg(data.pre+" : " +data.msg);
 })
 

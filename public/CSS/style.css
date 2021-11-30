@@ -160,6 +160,14 @@ margin: .5rem;
 overflow-y: auto;
 }
 
+#chat > a{
+    background-color: rgba(220, 220, 220, 0.75);
+    border:none;
+    outline: none;
+    cursor: pointer;
+    
+}
+
 #memberlist{
     height: 300px;
 width: 100%;
