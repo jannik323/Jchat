@@ -32,6 +32,7 @@ class room{
         this.password = password;
         this.creator = creator;
         rooms.push(this);
+        this.msgs = [];
     }
 }
 
@@ -65,19 +66,24 @@ io.on('connection', (socket) => {
         process.stdout.write("room created:" +data.name + " with pass :" + data.password+ " made by "+ socket.nickname+ "\n");
     });
 
+    let joinlimiter = new ratelimiter(2000);
     socket.on("joinroom",data=>{
+        if(!joinlimiter.islimit()){socket.emit("ratelimit",joinlimiter.limit); return;}
         joinroom(socket,data.name,data.password);
     })
 
-    let msglimiter = new ratelimiter(200);
+    let msglimiter = new ratelimiter(400);
     socket.on("sendmsg",data=>{
-        if(!msglimiter.islimit()){socket.emit("ratelimit",roomlimiter.limit); return;}
+        if(!msglimiter.islimit()){socket.emit("ratelimit",msglimiter.limit); return;}
         io.to(socket.curroom).emit("sendmsg",{pre:socket.nickname,msg:data});
+        let index =rooms.findIndex(e=>e.name==socket.curroom);
+        if(index===-1){return "no room";}
+        rooms[index].msgs.push({pre:socket.nickname,msg:data});
     })
 
-    let nicklimiter = new ratelimiter(1000);
+    let nicklimiter = new ratelimiter(4000);
     socket.on("sendnick",data=>{
-        if(!nicklimiter.islimit()){socket.emit("ratelimit",roomlimiter.limit); return;}
+        if(!nicklimiter.islimit()){socket.emit("ratelimit",nicklimiter.limit); return;}
         io.in(socket.curroom).emit("sysmsg",socket.nickname+" has changed their name to "+ data);
         socket.nickname = data;
         io.in(socket.curroom).emit("userlist",getnicknames(socket.curroom));
@@ -108,6 +114,7 @@ function joinroom(socket,room="default",password=false){
     if(room!=="default"){
         io.in(room).emit("sysmsg",socket.nickname+" has joined");
         io.in(room).emit("userlist",getnicknames(room));
+        socket.emit("lastmsgs",rooms[index].msgs);
     }
 
 

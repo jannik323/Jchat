@@ -168,6 +168,12 @@ overflow-y: auto;
     
 }
 
+#chat_roomname{
+    height: min-content;
+    font-size: 2rem;
+
+}
+
 #memberlist{
     height: 300px;
 width: 100%;

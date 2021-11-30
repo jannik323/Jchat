@@ -123,6 +123,17 @@ socket.on("ratelimit",data=>{
     alert("You got ratelimited. Wait "+ data/1000 + " seconds until you can perform that action again.")
 })
 
+socket.on("lastmsgs",data=>{
+    data.forEach((e)=>{
+        let pattern = new RegExp(/(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/igm);
+            if(pattern.test(e.msg)){
+                makelinkmsg(e.pre+" : ",e.msg)
+                return;
+            }
+        makemsg(e.pre+" : " +e.msg);        
+    })
+})
+
 socket.on("sendmsg",data=>{
     let pattern = new RegExp(/(?:(?:https?|ftp|file):\/\/|www\.|ftp\.)(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[-A-Z0-9+&@#\/%=~_|$?!:,.])*(?:\([-A-Z0-9+&@#\/%=~_|$?!:,.]*\)|[A-Z0-9+&@#\/%=~_|$])/igm);
         if(pattern.test(data.msg)){
