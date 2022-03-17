@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
     socket.nickname = "Dude"+(Math.round(Math.random()*1000));
     joinroom(socket);
     socket.emit("rooms",getroomnames());
-
+    process.stdout.write(socket.nickname+" connected");
 
 
     let roomlimiter = new ratelimiter(5000);
