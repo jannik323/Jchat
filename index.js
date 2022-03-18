@@ -65,6 +65,10 @@ io.on('connection', (socket) => {
         joinroom(socket,data.name,data.password);
         process.stdout.write("room created:" +data.name + " with pass :" + data.password+ " made by "+ socket.nickname+ "\n");
     });
+    
+    socket.on("getrooms",()=>{
+        socket.emit("rooms",getroomnames());
+    })
 
     let joinlimiter = new ratelimiter(2000);
     socket.on("joinroom",data=>{
